@@ -10,3 +10,10 @@ class Tenant(TenantMixin):
 
 class Domain(DomainMixin):
     pass
+
+
+class Hotel(models.Model):
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    picture = models.ImageField()
