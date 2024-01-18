@@ -10,20 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from os import getenv, path
 from pathlib import Path
+from django.core.management.utils import get_random_secret_key
+import dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+dotenv_file = BASE_DIR / '.env'
+
+if path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!i$+b85k2d!10bhe__u9=$wb#!*xc1ff0^db-a26ldil0#6q^j'
+SECRET_KEY = getenv('DJANGO_SECRET_KEY', get_random_secret_key())
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = []
 
@@ -35,21 +43,28 @@ THIRD_PARTY_APPS = [
 ]
 
 SHARED_APPS = [
+    'django_tenants',
+    'app',
+    'user',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_tenants',
+    'rest_framework',
 ] + THIRD_PARTY_APPS
 
 TENANT_APPS = [
     # Your tenant specific apps
-    'app.Hotel',
+    'hotel_app',
 ]
 
 INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
+
+TENANT_MODEL = "app.Tenant"
+
+TENANT_DOMAIN_MODEL = "app.Domain"
 
 MIDDLEWARE = [
     'app.middleware.TenantMainMiddleware',
@@ -89,6 +104,11 @@ WSGI_APPLICATION = 'multi_tenant.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django_tenants.postgresql_backend',
+        'NAME': 'drf-tenants-db',
+        'USER': 'postgres',
+        'PASSWORD': 'JehovahGod',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -138,3 +158,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'user.UserAccount'
