@@ -30,15 +30,26 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+THIRD_PARTY_APPS = [
+    # Thirdparty apps
+]
+
+SHARED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app',
+    'django_tenants',
+] + THIRD_PARTY_APPS
+
+TENANT_APPS = [
+    # Your tenant specific apps
+    'app.Hotel',
 ]
+
+INSTALLED_APPS = SHARED_APPS + [app for app in TENANT_APPS if app not in SHARED_APPS]
 
 MIDDLEWARE = [
     'app.middleware.TenantMainMiddleware',
